@@ -1,0 +1,7 @@
+{
+  "start_year":  "2019",
+  "start_month": "2",
+  "start_date":  "3",
+  "timezone":    "US/Eastern", 
+  "map_overlay": "data/maryland-pg-county.csv"
+}
