@@ -25,8 +25,8 @@ If you want to add new ATM locations, then you need to do the following:
         * From HOTOSM you can opt to download _just_ ATM points, which makes the file smaller
     * https://archive.org/download/metro.teczno.com
     * https://osmaxx.hsr.ch/
-1. Then, run `data/extract_atms.py`, which uses the ATM-tagged nodes in [OSM/XML](http://wiki.openstreetmap.org/wiki/OSM_XML) format and extracts/converts it into the [CSV format](data/osm-atm-garmin.csv) used internally, by gess.
-1. You can also download KML format data and use the `extract_atms_kml.py` script (`pykml` was an easier library to install than the `imposm` library required for OSM)
-1. Add the generated ATM location data file in CSV format to `gess.conf` so that gess picks it up on startup time.
+2. Then, run `data/extract_atms.py`, which uses the ATM-tagged nodes in [OSM/XML](http://wiki.openstreetmap.org/wiki/OSM_XML) format and extracts/converts it into the [CSV format](data/osm-atm-garmin.csv) used internally, by gess.
+3. You can also download KML format data and use the `extract_atms_kml.py` script (`pykml` was an easier library to install than the `imposm` library required for OSM)
+4. Add the generated ATM location data file in CSV format to `gess.conf` so that gess picks it up on startup time.
 ```
 
