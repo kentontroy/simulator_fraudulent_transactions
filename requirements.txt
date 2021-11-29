@@ -1,5 +1,5 @@
 dataclasses
-happybase
+hbase
 phoenixdb
 pytz
 thrift
