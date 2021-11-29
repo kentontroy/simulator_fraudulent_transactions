@@ -4,32 +4,16 @@ import json
 import logging
 import os
 import random
-import socket
 import sys
 import uuid
 from dataclasses import dataclass, field
 from pytz import timezone
+from simFinTransReceiver import FinTransReceiver
 from time import sleep
-from typing import List, Protocol
+from typing import List
 
 FORMAT = "%(asctime)-0s %(levelname)s %(message)s [at line %(lineno)d]"
 logging.basicConfig(level=logging.DEBUG, format=FORMAT, datefmt="%Y-%m-%dT%I:%M:%S")
-
-class FinTransReceiver(Protocol):
-  def send(self, finTranJSON: str) -> None:
-    ...
-
-class UDPReceiver(FinTransReceiver):
-  def __init__(self, host: str, port: int):
-    self.host = host
-    self.port = port
-    self.sOut = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-  def send(self, finTranJSON: str) -> None:
-    """ Sends a single financial transaction via UDP """ 
-    self.sOut.sendto(finTranJSON.encode(), (self.host, self.port))
-    logging.debug("Sent financial transaction: {0} to port {1} at {2}".format(finTranJSON, self.port, self.host))
-
 
 @dataclass
 class FinTransModel:
@@ -52,12 +36,12 @@ class FinTransSource:
   _atmLoc = {}
 
   atmDataInput: str 
-  targetUDPPort: int
   eventDelay: int
   timezone: str
+  receiver: FinTransReceiver
   model: FinTransModel = FinTransModel()
 
-  def loadData(self):
+  def loadData(self) -> None:
     """  Loads the ATM location data from the specified CSV data file """
     logging.info("Trying to parse ATM location data file %s" %(self.atmDataInput))
     osmAtmFile = open(self.atmDataInput, "r")
@@ -74,7 +58,7 @@ class FinTransSource:
       osmAtmFile.close()
       logging.debug(" -> loaded %d ATM locations in total." %(i))
   
-  def createFinTran(self):
+  def createFinTran(self) -> {}:
     """
       Obtains a random ATM location
       Simulates an account id (1-1000) and a transaction id (uniquely)
@@ -97,7 +81,7 @@ class FinTransSource:
     logging.debug("Created financial transaction: %s" %finTran)
     return finTran
 
-  def createFraudTran(self, finTran):
+  def createFraudTran(self, finTran: {}) -> {}:
     """ Creates a fraudulent transaction """
     rloc = random.choice(list(self._atmLoc.keys())) # obtain a random ATM location
     lat, lon, atmLabel = self._atmLoc[rloc]
@@ -117,34 +101,32 @@ class FinTransSource:
     logging.debug("Created fraudulent financial transaction: %s" %fraudTran)
     return fraudTran
 
-  def sendFinTran(self, receiver: FinTransReceiver, finTranJSON: str) -> None:
-    receiver.send(finTranJSON) 
+  def sendFinTran(self, finTranJSON: str) -> None:
+    self.receiver.send(finTranJSON) 
     
-  def dumpData(self):
-    """ Dumps the OSM ATM data """
+  def dumpData(self) -> None:
+    """ Dump the geocoded ATM dataset """
     for k, v in self._atmLoc.iteritems():
       logging.info("ATM %s location: %s %s" %(k, v[0], v[1])) 
   
-  def run(self):
+  def run(self) -> None:
     """ Generates financial transactions (ATM withdrawals) and sends them to a UDP port """
-    receiver = UDPReceiver(host="localhost", port=self.targetUDPPort) 
     ticks = 0 
     fraudTick = random.randint(self.model.fraudTickMin, self.model.fraudTickMax) 
-  
+
     logging.info("Sim is running")
 
     while True:
       ticks += 1      
       logging.debug("TICKS: %d" %ticks)
-
       finTran = self.createFinTran()
-      self.sendFinTran(receiver, json.dumps(finTran))
+      self.sendFinTran(json.dumps(finTran))
 
       sleep(self.eventDelay)
 
       # A fraudulent transaction will be created according to a randomized number of TICKS * DELAY in seconds 
       if ticks > fraudTick:
         fraudTran = self.createFraudTran(finTran)
-        self.sendFinTran(receiver, json.dumps(fraudTran))
+        self.sendFinTran(json.dumps(fraudTran))
         ticks = 0
         fraudTick = random.randint(self.model.fraudTickMin, self.model.fraudTickMax)
