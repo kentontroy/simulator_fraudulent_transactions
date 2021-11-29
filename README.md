@@ -30,3 +30,10 @@ If you want to add new ATM locations, then you need to do the following:
 4. Add the generated ATM location data file in CSV format to `gess.conf` so that gess picks it up on startup time.
 ```
 
+```
+https://phoenix.apache.org/python.html
+https://github.com/dajobe/hbase-docker
+
+pip3 install happybase
+pip3 install phoenixdb
+```
