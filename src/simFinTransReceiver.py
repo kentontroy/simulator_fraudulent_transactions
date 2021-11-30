@@ -1,6 +1,6 @@
 import logging
 import socket
-from typing import Protocol
+from typing_extensions import Protocol
 
 class FinTransReceiver(Protocol):
   def send(self, finTranJSON: str) -> None:
@@ -14,7 +14,7 @@ class FinTransUDPReceiver(FinTransReceiver):
 
   def send(self, finTranJSON: str) -> None:
     """ Sends a single financial transaction via UDP """
-    self.sOut.sendto(finTranJSON.encode(), (self.host, self.port))
+    self.sOut.sendto((finTranJSON + "\n").encode(), (self.host, self.port))
     logging.debug("Sent financial transaction: {0} to port {1} at {2}".format(finTranJSON, self.port, self.host))
 
 
