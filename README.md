@@ -37,3 +37,7 @@ https://github.com/dajobe/hbase-docker
 pip3 install happybase
 pip3 install phoenixdb
 ```
+
+```
+pip3 install -r requirements.txt
+```
