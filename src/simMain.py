@@ -5,7 +5,7 @@
 import logging
 import os
 from simFinTrans import FinTransSource
-from simFinTransReceiver import FinTransUDPReceiver
+from simFinTransReceiver import FinTransHBaseReceiver, FinTransUDPReceiver
 
 FORMAT = '%(asctime)-0s %(levelname)s %(message)s [at line %(lineno)d]'
 logging.basicConfig(level=logging.DEBUG, format=FORMAT, datefmt='%Y-%m-%dT%I:%M:%S')
@@ -36,6 +36,7 @@ if __name__ == '__main__':
 
   SIM_TARGET_RECEIVER = os.environ.get("SIM_TARGET_RECEIVER")
   if SIM_TARGET_RECEIVER is not None:
+
   # Build a UDP Receiver
     if SIM_TARGET_RECEIVER.upper() == "UDP":
       SIM_TARGET_UDP_PORT = os.environ.get("SIM_TARGET_UDP_PORT")
@@ -43,11 +44,25 @@ if __name__ == '__main__':
         SIM_TARGET_UDP_PORT = 6900
       else:
         SIM_TARGET_UDP_PORT = int(SIM_TARGET_UDP_PORT)
-      SIM_TARGET_UDP_HOST = os.environ.get("SIM_TARGET_UDP_HOST")
-      if SIM_TARGET_UDP_HOST is None:
-        SIM_TARGET_UDP_HOST = "localhost"
+      SIM_TARGET_UDP_HOST = os.environ.get("SIM_TARGET_UDP_HOST", "localhost")
 
       SIM_TARGET_RECEIVER = FinTransUDPReceiver(host=SIM_TARGET_UDP_HOST, port=SIM_TARGET_UDP_PORT)
+
+  # Build an Hbase Receiver
+    elif SIM_TARGET_RECEIVER.upper() == "HBASE":
+      SIM_TARGET_HBASE_DB_URL = os.environ.get("SIM_TARGET_HBASE_DB_URL", "localhost:8756")
+      SIM_TARGET_HBASE_AUTHN = os.environ.get("SIM_TARGET_HBASE_AUTHN", "SPNEGO")
+      SIM_TARGET_HBASE_AUTO_COMMIT = os.environ.get("SIM_TARGET_HBASE_AUTO_COMMIT", "True")
+      SIM_TARGET_HBASE_SSL_VERIFY = os.environ.get("SIM_TARGET_HBASE_SSL_VERIFY", "False")
+
+      SIM_TARGET_HBASE_AUTO_COMMIT = True if SIM_TARGET_HBASE_AUTO_COMMIT=="True" else False 
+      SIM_TARGET_HBASE_SSL_VERIFY = True if SIM_TARGET_HBASE_SSL_VERIFY=="True" else False 
+
+      SIM_TARGET_RECEIVER = FinTransHBaseReceiver(
+        authentication=SIM_TARGET_HBASE_AUTHN,
+        autocommit=bool(SIM_TARGET_HBASE_AUTO_COMMIT),
+        url=SIM_TARGET_HBASE_DB_URL,
+        verify=bool(SIM_TARGET_HBASE_SSL_VERIFY))
 
   else:
     SIM_TARGET_RECEIVER = FinTransUDPReceiver(host="localhost", port=6900)

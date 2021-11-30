@@ -26,7 +26,7 @@ class FinTransModel:
   withdrawalAmounts: List[int] = field(init=False, repr=False, default_factory=lambda: [0])
 
   def __post_init__(self):
-    self.withdrawlAmounts = list(range(self.minWithdrawal, self.maxWithdrawal, self.increments))
+    self.withdrawalAmounts = list(range(self.minWithdrawal, self.maxWithdrawal, self.increments))
 
 @dataclass
 class FinTransSource:
@@ -101,9 +101,6 @@ class FinTransSource:
     logging.debug("Created fraudulent financial transaction: %s" %fraudTran)
     return fraudTran
 
-  def sendFinTran(self, finTranJSON: str) -> None:
-    self.receiver.send(finTranJSON) 
-    
   def dumpData(self) -> None:
     """ Dump the geocoded ATM dataset """
     for k, v in self._atmLoc.iteritems():
@@ -120,13 +117,13 @@ class FinTransSource:
       ticks += 1      
       logging.debug("TICKS: %d" %ticks)
       finTran = self.createFinTran()
-      self.sendFinTran(json.dumps(finTran))
+      self.receiver.send(finTran)
 
       sleep(self.eventDelay)
 
       # A fraudulent transaction will be created according to a randomized number of TICKS * DELAY in seconds 
       if ticks > fraudTick:
         fraudTran = self.createFraudTran(finTran)
-        self.sendFinTran(json.dumps(fraudTran))
+        self.receiver.send(finTran)
         ticks = 0
         fraudTick = random.randint(self.model.fraudTickMin, self.model.fraudTickMax)
