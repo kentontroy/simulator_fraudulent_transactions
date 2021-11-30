@@ -7,9 +7,9 @@ issuing: !connect -p driver org.apache.phoenix.jdbc.PhoenixDriver -p user "none"
 Connecting to jdbc:phoenix:
 
 0: jdbc:phoenix:> 
-CREATE TABLE DEMO_ATM_TRANS
+CREATE TABLE DEMO_ATM_TRANS_
   (transaction_id VARCHAR PRIMARY KEY,
-   account_id VARCHAR,
+   account_id INTEGER,
    timestamp VARCHAR,
    atm VARCHAR,
    lat VARCHAR,
