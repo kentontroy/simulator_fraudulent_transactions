@@ -9,7 +9,7 @@ Connecting to jdbc:phoenix:
 0: jdbc:phoenix:> 
 CREATE TABLE DEMO_ATM_TRANS_
   (transaction_id VARCHAR PRIMARY KEY,
-   account_id INTEGER,
+   account_id VARCHAR,
    timestamp VARCHAR,
    atm VARCHAR,
    lat VARCHAR,
