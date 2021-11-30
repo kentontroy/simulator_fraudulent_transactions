@@ -8,11 +8,11 @@ Connecting to jdbc:phoenix:
 
 0: jdbc:phoenix:> 
 CREATE TABLE DEMO_ATM_TRANS
-  (transaction_id INTEGER PRIMARY KEY,
+  (transaction_id VARCHAR PRIMARY KEY,
    account_id VARCHAR,
    timestamp VARCHAR,
    atm VARCHAR,
    lat VARCHAR,
    lon VARCHAR,
-   amount VARCHAR)
+   amount INTEGER)
 ```
