@@ -1,3 +1,4 @@
+```
 $ phoenix-sqlline
 
 Setting property: [incremental, false]
@@ -14,3 +15,4 @@ CREATE TABLE DEMO_ATM_TRANS
    lat VARCHAR,
    lon VARCHAR,
    amount VARCHAR)
+```
