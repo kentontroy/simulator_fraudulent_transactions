@@ -1,3 +1,4 @@
+import json
 import logging
 import phoenixdb
 import phoenixdb.cursor
@@ -6,7 +7,7 @@ from dataclasses import dataclass, field
 from typing_extensions import Protocol
 
 class FinTransReceiver(Protocol):
-  def send(self, finTran: str) -> None:
+  def send(self, finTran: {}) -> None:
     ...
 
 class FinTransUDPReceiver(FinTransReceiver):
@@ -15,7 +16,7 @@ class FinTransUDPReceiver(FinTransReceiver):
     self.port = port
     self.sOut = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-  def send(self, finTran: str) -> None:
+  def send(self, finTran: {}) -> None:
     """ Sends a single financial transaction via UDP """
     finTranJSON = json.dumps(finTran)
     self.sOut.sendto((finTranJSON + "\n").encode(), (self.host, self.port))
@@ -36,7 +37,7 @@ class FinTransHBaseReceiver(FinTransReceiver):
       verify = self.verify, 
       authentication = self.authentication)
 
-  def send(self, finTran: str) -> None:
+  def send(self, finTran: {}) -> None:
     """ Sends a single financial transaction to Hbase """
     cur = self.dbConn.cursor()
     cur.execute(
