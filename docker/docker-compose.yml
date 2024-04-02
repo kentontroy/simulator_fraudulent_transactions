@@ -18,6 +18,10 @@
 # TO, DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR
 # UNAVAILABILITY, OR LOSS OR CORRUPTION OF DATA.
 #
+# Extended by: kdavis@cloudera.com
+# Changes to incorporate:
+# 1. Time series feeds requiring downsampling in Flink, i.e. aggregation of the data to a less granular time period
+# 2. Nifi push of the transformed stream into HDFS
 ################################################################################
 
 version: "2.1"
@@ -212,6 +216,26 @@ services:
       - flink-volume:/persistent
     depends_on:
       flink-jobmanager:
+        condition: service_healthy
+  
+  kafka-producer:
+    image: kafka-producer:latest
+    environment:
+      SIM_HOME: /usr/src/app
+      SIM_TIMEZONE: US/Eastern
+      SIM_DATA_FILE: /usr/src/app/sf-bay-area.csv
+      SIM_TARGET_RECEIVER: UDP
+      SIM_TARGET_UDP_HOST: localhost
+      SIM_TARGET_UDP_PORT: 6901
+    networks:
+      - csp-ce-net
+    ports:
+      - "6901:6901"
+    #command: sh -c "./sim.sh start && nc -u -l 6901 | ./kafka/bin/kafka-console-producer.sh --topic demo_atm_trans --bootstrap-server kafka:9092"
+    stdin_open: true 
+    tty: true
+    depends_on:
+      kafka: 
         condition: service_healthy
 
 networks:

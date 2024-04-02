@@ -1,0 +1,17 @@
+FROM centos:7
+
+RUN yum update -y && yum groupinstall -y "Development Tools" \
+    && yum install -y gcc openssl-devel libffi-devel bzip2-devel zlib-devel wget nc \
+    && wget https://www.python.org/ftp/python/3.8.12/Python-3.8.12.tgz \ 
+    && tar xvf Python-3.8.12.tgz \
+    && cd Python-3.8.12 \
+    && ./configure --enable-shared \
+    && make \
+    && make install \
+    && cp --no-clobber ./libpython3.8.so* /lib64/ \
+    && rm -rf /usr/bin/python3 \
+    && ln -s /usr/local/bin/python3.8 /usr/bin/python3 \
+    && rm -rf /usr/bin/pip3 \
+    && ln -s /usr/local/bin/pip3.8 /usr/bin/pip3 \
+    && mkdir -p /usr/src/app/logs \
+    && yum install -y java-1.8.0-openjdk-devel bind-utils

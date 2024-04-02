@@ -1,0 +1,23 @@
+version: "1.0"
+services:
+  udp-producer:
+    image: udp-producer:latest
+    environment:
+      SIM_HOME: /usr/src/app
+      SIM_TIMEZONE: US/Eastern
+      SIM_DATA_FILE: /usr/src/app/sf-bay-area.csv
+      SIM_TARGET_RECEIVER: UDP
+      SIM_TARGET_UDP_HOST: localhost
+      SIM_TARGET_UDP_PORT: 6901
+    command: sh -c "./sim.sh start && ./sim.sh test"
+    ports:
+      - "6901:6901"
+    networks:
+      - csp-ce-net
+    stdin_open: true 
+    tty: true
+
+networks:
+  csp-ce-net:
+    driver: bridge
+
