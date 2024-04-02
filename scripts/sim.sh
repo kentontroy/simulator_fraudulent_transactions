@@ -8,16 +8,16 @@ SIM_LOG=${SIM_HOME}/logs/sim.log
 SIM_PID=sim.pid
 
 function usage() {
-  printf "Usage: %s start | stop | status\n" $0
+  printf "Usage: %s start | stop | test\n" $0
 }
 
 function start_sim() {
-  nohup python3 ${SIM_HOME}/src/simMain.py &> $1 &
+  nohup python3 ${SIM_HOME}/simMain.py &> $1 &
   echo $! > $SIM_PID
 }
 
 function test_mods() {
-  python3 ${SIM_HOME}/src/simTest.py 
+  nc -v -u -l ${SIM_TARGET_UDP_PORT} | tee ${SIM_HOME}/logs/simTestNetCat.log
 }
 
 function stop_sim() {
