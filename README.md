@@ -1,3 +1,10 @@
+### Create a density plot of ATM transactions as an overlay on top of the SF Bay Area
+<img src="./images/sfbay_curated.png" alt=""/><br>
+
+### Briefly stated architecture
+<img src="./images/cloudera-data-in-motion.png" alt=""/><br>
+<img src="./images/r-studio.png" alt=""/><br>
+<img src="./images/data-pipeline.png" alt=""/><br>
 
 ### Simulate financial transactions (ATM withdrawals) as generated JSON 
 ```
@@ -78,6 +85,9 @@ docker cp scripts/simKafkaProducer.sh docker-kafka-producer-1:/usr/src/app
 docker-compose -f docker/docker-compose.yml exec kafka-producer sh simKafkaProducer.sh
 
 ```
+### Access the Cloudera Data-in-Motion UI stack
+<img src="./images/csp_url_locations.png" alt=""/><br>
+
 ### Create a Kafka table that maps to a Kafka topic
 ```
 Consider a Kafka table as a construct that can be continuously queried by a Flink job
@@ -95,6 +105,9 @@ DDL for the Kafka table is automatically generated as:
 ### Create a materialized view on top of the Kafka table via an SSB job
 <img src="./images/ssb_aggregation_query.png" alt=""/><br>
 
+### Choose what columns to project from the view
+<img src="./images/ssb_select_columns_for_mv.png" alt=""/><br>
+
 ### Create a REST Endpoint on top of the materialized view
 <img src="./images/ssb_materialized_view_rest_endpoint.png" alt=""/><br>
 
@@ -102,4 +115,31 @@ DDL for the Kafka table is automatically generated as:
 ```
 http://localhost:18131/api/v1/query/5195/summary?key=e148580d-875a-4906-b46c-f6e28b3990e8&limit=100
 
+```
+
+### Run R Code to perform analysis on the Materialized View data
+```
+R --no-save < src/mv_query.r
+
+> mv_source[, .(total = sum(sapply(total_amount, as.numeric))), by = .(eventWindow = sapply(window_end, paste))]
+             eventWindow  total
+                  <char>  <num>
+1: 2024-04-03 19:55:00.0 133920
+2: 2024-04-03 19:50:00.0  58840
+3: 2024-04-03 19:45:00.0  18060
+4: 2024-04-03 19:40:00.0  15300
+5: 2024-04-03 19:35:00.0   2040
+6: 2024-04-03 19:30:00.0   2060
+7: 2024-04-03 19:25:00.0   1160
+8: 2024-04-03 19:20:00.0    580
+```
+
+### Reference these helpful links and tutorials
+```
+https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
+https://rpubs.com/Linh-LTP/894196
+https://joshuamccrain.com/tutorials/maps/streets_tutorial.html
+https://jcoliver.github.io/learn-r/017-open-street-map.html
+https://wilkelab.org/ggtext/reference/geom_richtext.html
+https://cran.r-project.org/web/packages/ggtext/vignettes/plotting_text.html
 ```
