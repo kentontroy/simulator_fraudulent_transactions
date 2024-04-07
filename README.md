@@ -46,7 +46,8 @@ If you want to add new ATM locations, then you need to do the following:
 git clone https://github.com/kentontroy/simulator_fraudulent_transactions
 cd simulator_fraudulent_transactions 
 docker build -t centos7-base-image:latest -f docker/Dockerfile-base-image --no-cache .
-DOCKER_BUILDKIT=1 docker build -t kafka-producer:latest -f docker/Dockerfile-kafka-producer --no-cache .
+DOCKER_BUILDKIT=1 docker build -t kafka-client:latest -f docker/Dockerfile-kafka-client --no-cache .
+docker build -t jupyter-r:latest -f docker/Dockerfile-jupyter-r --no-cache .
 docker-compose -f docker/docker-compose.yml up
 
 docker inspect --format="{{json .NetworkSettings}}" docker-kafka-1 | python3 -m json.tool
